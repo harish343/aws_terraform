@@ -10,11 +10,9 @@ variable "image_id" {
 variable "instance_type" {
 
 }
-variable "secret_key" {
 
-}
 variable ports {
-    type = list(numbers)
+    type = list(number)
     default = [22,80,443,3306,27017]
 
 }
