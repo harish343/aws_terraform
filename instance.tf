@@ -43,9 +43,19 @@ resource "aws_instance" "web" {
   ami           = "${var.image_id}"
   instance_type = "${var.instance_type}"
   key_name = "${aws_key_pair.key-tf.key_name}"  
-  security_groups = ["${aws_security_group.allow_tls.id}"]
+  vpc_security_group_ids = ["${aws_security_group.allow_tls.id}"]
   tags = {
     Name = "First_tf_instance"
   }
   user_data = file("${path.module}/script.sh")
+}
+provisioner "file" {
+source = "readme.md"
+destination = "/tmp/readme.md"
+connection {
+  type = "ssh"
+  user = "ubuntu"
+  private_key = file("${path.module}/id_rsa")
+  host = "${self.public_ip}"
+}
 }
