@@ -47,10 +47,5 @@ resource "aws_instance" "web" {
   tags = {
     Name = "First_tf_instance"
   }
-  user_data = <<EOF
-  #!/bin/bash
-  sudo apt-get update
-  sudo apt-get install nginx -y
-  sudo echo "hi harish" >/var/www/html/index.nginx-debian.html
-  EOF
+  user_data = file("${path.module}/script.sh")
 }
