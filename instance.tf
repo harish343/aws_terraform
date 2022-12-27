@@ -12,7 +12,7 @@ resource "aws_security_group" "allow_tls" {
   description = "Allow TLS inbound traffic"
 
   dynamic "ingress" {
-     for_each = [22,80,3306,27017]
+     for_each = var.ports
      iterator = port
      content {
       description = "TLS from VPC"
@@ -20,14 +20,30 @@ resource "aws_security_group" "allow_tls" {
       to_port = port.value
       protocol = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
      }  
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+
   }
 }
 
+output securityGroupDetails {
+  value = "${aws_security_group.allow_tls}"
+}
+
+
 resource "aws_instance" "web" {
-  ami           = "ami-0574da719dca65348"
-  instance_type = "t2.micro"
+  ami           = "${var.image_id}"
+  instance_type = "${var.instance_type}"
   key_name = "${aws_key_pair.key-tf.key_name}"  
+  security_groups = ["${aws_security_group.allow_tls.id}"]
   tags = {
     Name = "First_tf_instance"
   }
